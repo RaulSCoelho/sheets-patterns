@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SheetPattern {
+  id      String        @id @default(uuid())
+  name    String        @unique
+  columns SheetColumn[]
+}
+
+model SheetColumn {
+  id                 String            @id @default(uuid())
+  name               String
+  dataType           String
+  rules              SheetColumnRules? @relation(fields: [sheetColumnRulesId], references: [id])
+  sheetColumnRulesId String?
+  SheetPattern       SheetPattern?     @relation(fields: [sheetPatternId], references: [id])
+  sheetPatternId     String?
+}
+
+model SheetColumnRules {
+  id            String        @id @default(uuid())
+  maxLength     Int?
+  minLength     Int?
+  allowedValues StringList[]
+  SheetColumn   SheetColumn[]
+}
+
+model StringList {
+  id                 String            @id @default(uuid())
+  value              String
+  SheetColumnRules   SheetColumnRules? @relation(fields: [sheetColumnRulesId], references: [id])
+  sheetColumnRulesId String?
+}
